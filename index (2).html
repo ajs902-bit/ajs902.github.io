@@ -218,5 +218,36 @@
     <span>&copy; 2026 Alexander Skiba</span>
   </div>
 </footer>
+  <script>
+(function () {
+  if (location.protocol === 'file:') return; // skip when previewing the file on your own computer
+
+  // Headshot: use a full-quality file if one is in the repo
+  var photo = document.querySelector('.photo');
+  var photoNames = ['headshot.jpg', 'headshot.jpeg', 'headshot.png', 'headshot.webp', 'Headshot.jpg', 'photo.jpg'];
+  (function tryPhoto(i) {
+    if (i >= photoNames.length) return; // keep the built-in photo
+    var t = new Image();
+    t.onload = function () { photo.src = photoNames[i]; };
+    t.onerror = function () { tryPhoto(i + 1); };
+    t.src = photoNames[i];
+  })(0);
+
+  // Resume: point the button at whichever PDF exists
+  var btn = document.querySelector('.dl .btn');
+  var pdfNames = ['Alexander_Skiba_Resume.pdf', 'resume.pdf', 'Resume.pdf', 'Alexander_Skiba_Resume_2026.pdf'];
+  (function tryPdf(i) {
+    if (i >= pdfNames.length) {
+      btn.textContent = 'Resume available on request';
+      btn.removeAttribute('href');
+      btn.removeAttribute('download');
+      return;
+    }
+    fetch(pdfNames[i], { method: 'HEAD' })
+      .then(function (r) { if (r.ok) { btn.href = pdfNames[i]; } else { tryPdf(i + 1); } })
+      .catch(function () { tryPdf(i + 1); });
+  })(0);
+})();
+</script>
 </body>
 </html>
